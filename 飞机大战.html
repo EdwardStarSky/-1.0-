@@ -1,0 +1,548 @@
+<!doctype html>
+<!--文档类型:html文档(html5标准模式)-->
+<!--注释:是给开发人员看的-->
+<html lang='en'>
+<!--html跟标签 lang意思是翻译成英文-->
+
+<head>
+    <!--网页的头部-->
+    <meta charset='utf-8' />
+    <!--meta是单标签,单标签在后面括号前加/,以表示闭合,charset是设置字符编码的,utf-8是国际编译代码-->
+    <meta name='generator' content='EditPlus®' />
+    <!--generator意思是使用的编译软件,content后面是编译软件名字-->
+    <meta name='author' content='星空' />
+    <!--author这是网站作者的意思-->
+    <meta name='keywords' content='潭州教育48期,阿飞老师,00作业' />
+    <!--网页三要素之一,这是网页的关键词,给搜索引擎搜索你的网页用的,-->
+    <meta name='description' content='梗概,简介,' />
+    <!--网页三要素之一,这是对自己的网页的一些简介.-->
+    <title>Document</title>
+    <!--网页三要素之一,标题,这是在网页最上面的名词-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        #warp {
+            overflow: hidden;
+            position: relative;
+            width: 512px;
+            height: 768px;
+            margin: 0 auto;
+        }
+
+        #game {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #bg {
+            position: absolute;
+            top: -786px;
+            font-size: 0;
+        }
+
+        #warp dl {
+            position: absolute;
+            top: 20%;
+            width: 100%;
+            text-align: center;
+        }
+
+        #warp dl dt {
+            margin-bottom: 50px;
+            font-size: 30px;
+            color: #fff;
+        }
+
+        #warp dl dd {
+            width: 25%;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 2px solid transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        #warp dl dd.money {
+            background-color: orange;
+            color: #fff;
+        }
+
+        #warp dl dd:hover {
+            border: 2px solid red;
+            color: red
+        }
+
+        #warp .on {
+            transition: opacity 1s;
+        }
+
+        @keyframes on {
+            0% {
+                opacity: 1;
+            }
+
+            25% {
+                opacity: 0;
+            }
+
+            50% {
+                opacity: .7;
+            }
+
+            75% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: .7;
+            }
+        }
+        #score{
+            display: none;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            color: #fff;
+        }
+        #game .twinkle{
+            animation: on .9s linear 1
+        }
+        #gameover{
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 358px;
+            height:154px;
+            margin-top:-77px;
+            margin-left:-179px;
+            border: 1px solid #fff;
+            color: #fff;
+            text-align: center    
+        }
+        #gameover p{
+            margin: 5px 0;
+            font-size: 30px;
+        }
+        #again{
+            width: 100px;
+            height: 50px;
+            margin: auto;
+            background-color: orange;
+            color: #000;
+            line-height: 50px;
+            font-size: 20px;
+            font-weight: bolder;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!--网页的身体,里面的内容是给浏览者观看得到的东西-->
+    <div id="warp">
+        <div id="bg">
+            <img src="./images/bg_1.jpg" alt="">
+            <img src="./images/bg_1.jpg" alt="">
+        </div>
+        <div id="game"></div>
+        <dl>
+            <dt>飞机大战V1.0</dt>
+            <dd>简单模式</dd>
+            <dd>普通模式</dd>
+            <dd>困难模式</dd>
+            <dd class="money">充钱模式</dd>
+        </dl>
+        <div id="score">
+            0
+        </div>
+        <div id="gameover">
+            <p>游戏结束</p>
+            <p class="score">0</p>
+            <div id='again'>重新再来</div>
+        </div>
+    </div>
+    <script>
+        (function () {
+
+            let oWarp = document.getElementById('warp'), // 获取页面上最大的的div
+                oDl = document.querySelector('#warp dl'), // 获取页面上包裹着菜单栏的dl标签
+                oGame = document.getElementById('game'), // 获取到页面上的游戏区域的div标签
+                aDd = [...document.querySelectorAll('#warp dl dd')], // 获取开始页面上可以点击的节点
+                bgDiv = document.getElementById('bg'), // 获取到包裹着背景图的div标签
+                aImg = [...document.querySelectorAll('#bg img')], // 获取到背景图标签们
+                aFire = document.getElementsByClassName('fire'), // 动态获取子弹的节点
+                oSc = document.getElementById('score'),// 获取右上角分数的节点
+                oOver = document.getElementById('gameover'), // 获取到游戏结束界面的节点
+                oAgain = document.getElementById('again'),// 获取重新开始的节点
+                oScor = oOver.getElementsByClassName('score')[0],//获取结束后显示分数的节点
+                n = bgDiv.offsetTop, // 保存背景的初始高度
+                num = 0, // 分数需要的数字初始值
+                pm = null,
+                fireTime,
+                enemyTime; // 记录背景图的初始top值
+            console.log(aImg)
+
+            // 重新开始的按钮点击事件
+            oAgain.addEventListener('click',function(){
+                oOver.style.display = 'none';
+                oDl.style.display = 'block';
+                oSc.style.display = 'none'
+                oSc.innerText = '0';
+                oGame.innerHTML = '';
+            },false)
+
+            // 背景的移动
+            function bgMove() {
+                n += .3
+                if (n >= 0) {
+                    n = -786
+                }
+                bgDiv.style.top = n + 'px'
+                requestAnimationFrame(bgMove)
+            }
+            requestAnimationFrame(bgMove)
+
+            // 菜单被点击的函数
+            aDd.forEach((obj, idx) => {
+                obj.addEventListener('click', function (event) {
+                    // 把主菜单移出
+                    oDl.style.display = 'none'
+                    oSc.style.display = 'block'
+                    aImg.forEach(obj => {
+                        obj.src = `./images/bg_${idx + 1}.jpg`// 点击了某一菜单,对应的背景图片改变src
+                    })
+                    let cX = event.pageX // 获取鼠标在页面中的left位置
+                    let cY = event.pageY // 获取鼠标在页面中的top位置
+
+                    console.log(cX, cY, oWarp.offsetLeft)
+                    // 生成我军
+                    plane(idx, cX, cY)
+                    // 敌军生成
+                    armPlane(idx)
+                }, false)
+            })
+
+            // 生成我军飞机
+            function plane(idx, cX, cY) {
+                let oPlane = new Image(),// 生成新的图片
+                    width = 50, // 记录宽度
+                    height = 50, // 记录高度
+                    planeLeft, // 声明left值
+                    planeTop; // 声明top值
+
+                planeLeft = cX - oWarp.offsetLeft - width / 2 // 飞机的left值的运算
+                planeTop = cY - height / 2 // 飞机的top值的运算
+                oPlane.HP = 3
+                // 我军飞机样式
+                oPlane.style.position = 'absolute'
+                oPlane.style.width = width + 'px'
+                oPlane.style.height = height + 'px'
+                oPlane.style.left = planeLeft + 'px'
+                oPlane.style.top = planeTop + 'px'
+                oPlane.src = './images/plane_0.png'
+                oPlane.id = 'plane'
+
+
+                // 加入到界面里
+                oGame.appendChild(oPlane)
+
+                //飞机移动
+                pm = planeMove(oPlane, width, height, cX, cY)
+
+                //飞机射击
+                planeFire(oPlane, idx)
+            }
+
+            // 我军飞机移动函数
+            function planeMove(oPlane, width, height, cX, cY) {
+                let minLeft = -width / 2,
+                    maxLeft = oWarp.offsetWidth - width / 2,
+                    minTop = 0,
+                    maxTop = oWarp.offsetHeight - height / 2
+
+                document.addEventListener('mousemove', pm, false)
+
+                //我军飞机移动
+                function pm(event) {
+                    let nLeft = event.pageX - oWarp.offsetLeft - width / 2,
+                        nTop = event.pageY - height / 2;
+                    nLeft = Math.max(nLeft, minLeft)
+                    nLeft = Math.min(nLeft, maxLeft)
+                    nTop = Math.max(nTop, minTop)
+                    nTop = Math.min(nTop, maxTop)
+                    oPlane.style.left = nLeft + 'px'
+                    oPlane.style.top = nTop + 'px'
+                    console.log(nLeft, nTop, oWarp.offsetLeft)
+                }
+                return pm
+            }
+
+
+            // 我军子弹函数
+            function planeFire(oPlane, idx) {
+                //设置速度
+                let arr = [150, 200, 250, 100],
+                    speed = 15;
+                // 生成射击
+                let fire = new Image(),
+                    width = 20,
+                    height = 40;
+                // 子弹样式
+                fire.src = './images/fire.png';
+                fire.width = width;
+                fire.height = height;
+                fire.style.position = 'absolute';
+                fire.className = 'fire';
+
+                ~function getfire() {
+                    // 克隆子弹
+                    let nFire = fire.cloneNode(),
+                        //子弹的位置
+                        nFireLeft = oPlane.offsetLeft + oPlane.offsetWidth / 2 - width / 2,
+                        nFireTop = oPlane.offsetTop;
+
+                    nFire.style.left = nFireLeft + 'px'
+                    nFire.style.top = nFireTop + 'px'
+
+                    // 让子弹加入界面
+                    oGame.appendChild(nFire)
+
+                    // 子弹运动
+                    function move() {
+                        if (!nFire || !nFire.parentNode) return;
+                        nFireTop -= speed
+                        nFire.style.top = nFireTop + 'px'
+                        if (nFireTop <= -height) {
+                            oGame.removeChild(nFire);
+                        } else {
+                            requestAnimationFrame(move)
+                        }
+                    }
+                    requestAnimationFrame(move)
+                    fireTime = setTimeout(getfire, arr[idx])
+                }()
+            }
+
+            // 敌军生成
+            function armPlane(idx) {
+                // 小飞机
+                let sPlane = new Image(),
+                    sWidth = 54,
+                    sHeight = 40,
+                    // 大飞机
+                    bPlane = new Image(),
+                    bWidth = 130,
+                    bHeight = 100;
+                // 小飞机的样式
+                sPlane.src = './images/enemy_small.png';
+                sPlane.width = sWidth;
+                sPlane.Height = sHeight;
+                sPlane.style.position = 'absolute'
+                sPlane.className = 'small'
+
+                // 大飞机的样式
+                bPlane.src = './images/enemy_big.png'
+                bPlane.width = bWidth;
+                bPlane.Height = bHeight;
+                bPlane.style.position = 'absolute'
+                sPlane.className = 'big'
+
+                let num = 0, // 用于记录生成的第几个飞机
+                    eSpeed = 15
+
+                ~function enemy() {
+                    ++num
+                    let ePlane = num % 5 ? sPlane.cloneNode() : bPlane.cloneNode(),// 判断生成的敌军是大飞机还是小飞机
+                        eLeft = Math.floor(Math.random() * oWarp.offsetWidth) - ePlane.width / 2,// 生成的敌军的left的初始值运算
+                        eTop = -ePlane.height; // 生成的敌军的top的初始值运算
+
+                    ePlane.style.top = eTop + 'px' // 把运算好的left添加到敌军飞机的样式上
+                    ePlane.style.left = eLeft + 'px' // 把运算好的top添加到敌军飞机的样式上
+                    ePlane.HP = num % 5 ? Math.floor(Math.random() * 3 + 1) : 5; // 给敌军增加血量用,打飞机5点血量,小飞机随机[1,4)取整 1到3的血量
+
+                    // 添加到界面里
+                    oGame.appendChild(ePlane)
+                    console.log(ePlane)
+
+                    //敌军的飞行速度
+                    ePlane.speed = Math.floor(Math.random() * 5 + 2)
+
+                    // 敌军飞机移动函数
+                    function eMove() {
+                        if (!ePlane || !ePlane.parentNode) return;
+                        eTop += ePlane.speed // 敌军移动只改变top值
+                        ePlane.style.top = eTop + 'px'
+                        if (eTop >= oWarp.offsetHeight) { // 判断top值是否超过显示页面 ,真则移除掉这个
+                            oGame.removeChild(ePlane); // 移除敌军飞机
+                        } else { // 假则继续运动
+                            requestAnimationFrame(eMove)
+                        }
+                        boom1(ePlane) // 子弹碰撞到敌军的函数
+                        boom2(ePlane) // 我军飞机碰撞到敌军的函数
+
+                    }
+                    requestAnimationFrame(eMove) // 动画执行一次移动函数
+                    enemyTime = setTimeout(enemy, 1000 - (idx * 70)) // 定时器生成敌军飞机,根据不同的难度,生成的敌军数量不同
+                }()
+
+            }
+
+            // 碰撞检测函数
+            function peng(obj, ele) {
+                let L1 = obj.offsetLeft,
+                    T1 = obj.offsetTop,
+                    R1 = L1 + obj.offsetWidth,
+                    B1 = T1 + obj.offsetHeight,
+                    L2 = ele.offsetLeft,
+                    T2 = ele.offsetTop,
+                    R2 = L2 + ele.offsetWidth,
+                    B2 = T2 + ele.offsetHeight;
+
+                return !(R2 < L1 || B2 < T1 || L2 > R1 || T2 > B1);//判断有没有碰撞上,返回布尔值,真是碰上,假没碰撞上
+            }
+
+            // 子弹碰撞到敌军的函数
+            function boom1(ele) {
+                if (!ele.parentNode) return;
+                // 获取所有子弹
+                let arrFire = [...aFire]
+                // 遍历子弹去判断有没有碰到敌军
+                for (let i = 0, len = arrFire.length; i < len; i++) {
+                    let bul = arrFire[i];
+                        
+                    if (peng(bul, ele)) {
+                        ele.HP-- // 敌军扣血
+                        oGame.removeChild(bul); // 子弹移除
+                        score()
+                        if (ele.HP === 0) {
+                            eBoom(ele)
+                            oGame.removeChild(ele);
+                            score(ele)
+                        }
+                            oSc.innerText = num + ''
+                    }
+
+                }
+
+            }
+
+            // 敌军爆炸图片显示函数
+            function eBoom(obj) {
+                let oBoom = new Image(), //新建一个img标签
+                    width = obj.offsetWidth, // 获取宽度值
+                    height = obj.offsetHeight, // 获取高度值
+                    left = obj.offsetLeft, // 获取left值
+                    top = obj.offsetTop; // 获取 top值
+
+                //爆炸的图片的样式
+                oBoom.style.position = 'absolute';
+                oBoom.style.width = width + 'px';
+                oBoom.style.height = height + 'px';
+                oBoom.style.left = left + 'px';
+                oBoom.style.top = top + 'px';
+                oBoom.src = './images/boom_small.png'
+                oBoom.className = 'on'
+
+                // 爆炸的img加入到游戏上
+                oGame.appendChild(oBoom)
+
+                setTimeout(function () {
+                    // 爆炸img的样式的透明度变为0 因为上面有写transion 渐变,所以这里会慢慢变透明
+                    oBoom.style.opacity = 0;
+                    oBoom.addEventListener('transitionend', function () {
+                        // 这个是transition事件过后就开启这个事件函数
+
+                        // 这里就将爆炸图片移除,以免占用内存
+                        oGame.removeChild(this);
+                    }, false)
+                }, 1000)
+
+            }
+
+            // 飞机碰撞到敌军是后的函数
+            function boom2(ele) {
+                let plan = document.getElementById('plane')
+                //if(!ele.parentNode) return;
+                if (!plan) return;
+                //碰撞成功后
+                if (peng(plan, ele)) {
+                    console.log(plan.HP)
+                    plan.HP--
+                    oGame.removeChild(ele)
+                    score(ele)
+                    if (plan.HP === 0) {
+                        // 生成爆炸图片
+                        pBoom(plan)
+                        // 解除飞机的鼠标移动飞行的事件
+                        document.removeEventListener("mousemove", pm, false);
+                        // 游戏结束了所以要停止生成敌军和生成子弹的定时器
+                        clearTimeout(fireTime)
+                        clearTimeout(enemyTime)
+
+                        // 飞机节点被移除
+                        oGame.removeChild(plan)
+
+                        // 节点被移除后的游戏结束事项
+
+                        // 显示分数 
+                        oScor.innerText = num + '';
+                        // 一秒后才显示结算界面
+                        setTimeout(()=>{
+                            oOver.style.display = 'block'
+                        },1000)
+
+                    }else{
+                        plan.classList.add('twinkle')
+                        setTimeout(()=>{
+                            plan.classList.remove('twinkle')
+                        },900)
+                    }
+                    
+                } 
+                oSc.innerText = num + ''
+            }
+
+            // 我军爆炸后的图片生成函数
+            function pBoom(obj) {
+                let oBoom = new Image(),
+                    width = obj.offsetWidth,
+                    height = obj.offsetHeight,
+                    left = obj.offsetLeft,
+                    top = obj.offsetTop;
+
+                oBoom.style.position = 'absolute';
+                oBoom.style.width = width + 'px';
+                oBoom.style.height = height + 'px';
+                oBoom.style.left = left + 'px';
+                oBoom.style.top = top + 'px';
+                oBoom.src = './images/boom_big.png'
+
+                oGame.appendChild(oBoom)
+            }
+
+            //分数计算函数
+            function score(obj){
+
+                if(!obj){//判断有没有传入参数,没有传参数则代表敌军没死
+                    num +=10
+                }else if(obj.classList.contains('small')){ // 判断是否是的是小飞机
+                    num += 200
+                }else{ // 剩下死的就是大飞机
+                    num += 500
+                }
+            }
+
+
+        })()
+    </script>
+</body>
+
+</html>
+<!--这就是网页的基本样式-->
