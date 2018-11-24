@@ -1,0 +1,240 @@
+<!doctype html>
+<!--文档类型:html文档(html5标准模式)-->
+<!--注释:是给开发人员看的-->
+<html lang='en'>
+<!--html跟标签 lang意思是翻译成英文-->
+
+<head>
+    <!--网页的头部-->
+    <meta charset='utf-8' />
+    <!--meta是单标签,单标签在后面括号前加/,以表示闭合,charset是设置字符编码的,utf-8是国际编译代码-->
+    <meta name='generator' content='EditPlus®' />
+    <!--generator意思是使用的编译软件,content后面是编译软件名字-->
+    <meta name='author' content='星空' />
+    <!--author这是网站作者的意思-->
+    <meta name='keywords' content='潭州教育48期,阿飞老师,00作业' />
+    <!--网页三要素之一,这是网页的关键词,给搜索引擎搜索你的网页用的,-->
+    <meta name='description' content='梗概,简介,' />
+    <!--网页三要素之一,这是对自己的网页的一些简介.-->
+    <title>Document</title>
+    <!--网页三要素之一,标题,这是在网页最上面的名词-->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        #warp {
+            width: 500px;
+            height: 430px;
+            margin: 50px auto;
+            border: 1px solid #000;
+        }
+
+        .clearfix:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
+
+        #warp .head {
+            width: 100%;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            background-color: skyblue;
+        }
+
+        #warp .head select {
+            width: 120px;
+            margin-right: 50px;
+        }
+
+        #warp .head button {
+            width: 50px;
+        }
+
+        #warp .content ul {
+            display: flex;
+        }
+
+        #warp .content ul.week li {
+            flex: 1;
+            height: 35px;
+            text-align: center;
+            line-height: 35px;
+            border: 1px solid #000;
+            border-collapse: collapse;
+        }
+
+        #warp .content ul.day {
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        #warp .content ul.day li {
+            width: 70px;
+            height: 55px;
+            margin: 1px 0;
+            text-align: center;
+            line-height: 55px;
+            border-collapse: collapse;
+            /* background-color: green; */
+        }
+    </style>
+</head>
+
+<body>
+    <!--网页的身体,里面的内容是给浏览者观看得到的东西-->
+    <div id="warp">
+        <div class="head">
+            <select id="year">
+                <option value="">请选择年份</option>
+            </select>
+            <select id="moth">
+                <option value="">请选择月份</option>
+            </select>
+            <button id='check'>查询</button>
+        </div>
+        <div class="content">
+            <ul class="week">
+                <li>日</li>
+                <li>一</li>
+                <li>二</li>
+                <li>三</li>
+                <li>四</li>
+                <li>五</li>
+                <li>六</li>
+            </ul>
+            <ul class="day">
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        (function () {
+            let oYear = document.getElementById('year'),
+                oMoth = document.getElementById('moth'),
+                oBtn = document.getElementById('check'),
+                aLi = document.querySelectorAll('#warp .content .day li'),
+                yVal,mVal;
+            //console.log(aLi);
+
+            oBtn.onclick = function () {
+                //console.log(oMoth.value);
+                // console.log(oYear.value);
+                let yearVal = oYear.value,
+                    mothVal = oMoth.value,
+                    arr = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+                    nday = new Date(yearVal, mothVal - 1).getDay();
+                if(yVal === yearVal && mothVal === mVal) return
+                        aLi.forEach(obj => {
+                            obj.innerHTML = ''
+                        })
+                console.log(nday);
+                
+                if (yearVal % 4 === 0 && (yearVal % 100 !== 0 || yearVal % 400 === 0)) {
+                    // 这是闰年的操作
+                    arr[1] = 29;
+                }
+                console.log(arr[mothVal]);
+                console.log(mothVal);
+                each({
+                    min: 1,
+                    max: arr[mothVal-1]
+                },
+                    function (i) {
+                        aLi[nday+i-1].innerHTML = i
+                        //console.log(aLi[i+nday]);    
+                        yVal = oYear.value,
+                        mVal = oMoth.value
+                    }
+                )
+
+
+            }
+
+            each({
+                min: 1900,
+                max: 2500
+            }, function (i) {
+                let oOption = document.createElement('option'),
+                    val = i;
+                oOption.innerHTML = val;
+
+                oYear.appendChild(oOption);
+            })
+
+            each({
+                min: 1,
+                max: 12
+            }, function (i) {
+                let oOption = document.createElement('option'),
+                    val = i;
+                oOption.innerHTML = val;
+                oMoth.appendChild(oOption);
+            })
+
+
+
+            function each(obj, callback) {
+                let min = obj.min,
+                    max = obj.max;
+                if (min >= max) {
+                    alert('参数出错,最小值大于最大值了,请重新输入值')
+                    return;
+                };
+                for (let i = min; i <= max; i++) {
+                    callback(i)
+                }
+
+            }
+
+        })()
+    </script>
+</body>
+
+</html>
+<!--这就是网页的基本样式-->
